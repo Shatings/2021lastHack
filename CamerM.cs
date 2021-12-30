@@ -15,6 +15,7 @@ public class CamerM : MonoBehaviour
     [SerializeField]
     private float speed;
 
+
     private void Start()
     {
         player = GameObject.Find("Player").GetComponent<Player>();

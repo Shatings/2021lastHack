@@ -21,6 +21,7 @@ public class DB : MonoBehaviour
         SetAtcive();
         for(int i = 0; i < dbtransform.childCount; i++)
         {
+            dbtransform.GetChild(i).gameObject.SetActive(false);
             nicknames.Add(dbtransform.GetChild(i).transform.Find("NickName").GetComponent<Text>());
             scores.Add(dbtransform.GetChild(i).transform.Find("Score").GetComponent<Text>());
             times.Add(dbtransform.GetChild(i).transform.Find("Time").GetComponent<Text>());
@@ -51,6 +52,8 @@ public class DB : MonoBehaviour
         }
         else
         {
+            char d='T';
+           
             loadingt.gameObject.SetActive(false);
             SetAtcive();
             Debug.Log(www.downloadHandler.text);
@@ -58,11 +61,14 @@ public class DB : MonoBehaviour
             string tokendata = File.ReadAllText(Application.dataPath + "Login.json");
             JsonData token = JsonMapper.ToObject(tokendata);
             Debug.Log(token.ToString());
-            for(int i = 0; i < token.Count; i++)
+            for(int i = 0; i < token["data"].Count; i++)
             {
                 nicknames[i].text = token["data"][i]["nickname"].ToString();
                 scores[i].text = ((int)token["data"][i]["score"]).ToString();
-                times[i].text = ((long)token["data"][i]["time"]).ToString();
+                string[] ad = (token["data"][i]["time"]).ToString().Split(d);
+                times[i].text = ad[0];
+                dbtransform.GetChild(i).gameObject.SetActive(true);
+               
             }
             
             File.Delete(Application.dataPath + "Login.json");

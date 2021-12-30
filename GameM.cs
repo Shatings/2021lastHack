@@ -24,9 +24,11 @@ public class GameM : MonoBehaviour
     public bool endgame = false;
     public bool waitmove;
     [SerializeField]
-    public float jumppower=5;
+    public float jumppower;
+    public string type;
     void Awake()
     {
+        type = "EMy";
         ListAdd(emysrespwn,emys);
         ListAdd(scorerspwn, gameObjectscore);
     
@@ -125,7 +127,7 @@ public class GameM : MonoBehaviour
     {
         for (int i = 0; i < _transform.childCount; i++)
         {
-            if (FindObjectOfType<Player>().CheckY(_list[i], _transform))
+            if (FindObjectOfType<Player>().CheckY(_list[i], _transform,type))
             {
                 _list[i].SetActive(false);
                 scorre++;
