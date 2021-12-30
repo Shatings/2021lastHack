@@ -13,25 +13,33 @@ public class Player : MonoBehaviour
     private int jumpcount;
     
    
-    private int itemindex;
+   
 
     public Transform checky;
     
     public Transform respown;
+
+    public string type;
   
 
     public GameM gmem;
     public GameObject esekey;
+    public Animator ani;
 
 
     public int hp;
+    public GameObject hit;
+    public float checktime;
 
     void Start()
     {
+        type = "Player";
         colle = GetComponent<Collider2D>();
         rigy = GetComponent<Rigidbody2D>();
         gmem = FindObjectOfType<GameM>();
         hp = 100;
+        ani=GetComponent<Animator>();
+        hit.SetActive(false);
         
     }   
     public void Move()
@@ -44,8 +52,19 @@ public class Player : MonoBehaviour
         {
             vector = Vector3.zero;
             vector = (Input.GetAxisRaw("Horizontal") > 0) ? Vector3.right : Vector3.left;
+            transform.localScale = new Vector3((vector == Vector3.right) ? 1 : -1, transform.localScale.y);
+            ani.SetBool("Run", true);
+
             transform.position += vector * speed * Time.deltaTime;
         }
+        else
+        {
+            ani.SetBool("Run", false);
+        }
+    }
+    public void Check(bool _chekc)
+    {
+        hit.SetActive(_chekc);
     }
     public void testJump()
     {
@@ -62,15 +81,22 @@ public class Player : MonoBehaviour
         jump = false;
         jumpcount--;
     }
-    public bool CheckY(GameObject y, Transform _transform)
+    public bool CheckY(GameObject y, Transform _transform,string _type)
     {
+       
         if (y.transform.position.y < checky.position.y)
         {
             Debug.Log("¼º°ø");
+            Debug.Log(_type);
             y.transform.position=_transform.position;
+            if (_type.Equals("Player"))
+            {
+                hp = 0;
+            }
             return true;
         }
-        return false;
+        
+            return false;
        
     }
     // Update is called once per frame
@@ -105,9 +131,17 @@ public class Player : MonoBehaviour
     
     private void FixedUpdate()
     {
-        
+        if (hit.activeSelf)
+        {
+            checktime+=Time.deltaTime;
+            if (checktime > 0.2f)
+            {
+                Check(false);
+                checktime = 0;
+            }
+        }
         testJump();
-        CheckY(this.gameObject, respown);
+        CheckY(this.gameObject, respown,type);
     }
   
 
@@ -117,7 +151,7 @@ public class Player : MonoBehaviour
         if (collision.gameObject.tag == "Ground")
         {
            
-            jumpcount=1;
+            jumpcount=2;
         }
     }
     public void OnTriggerEnter2D(Collider2D collision)
@@ -128,6 +162,7 @@ public class Player : MonoBehaviour
             if (collision.gameObject.tag == "Emy")
             {
                 SoundM.instanse.SoundEff(0);
+                Check(true);
                 hp -= 10;
                 collision.gameObject.transform.position = FindObjectOfType<GameM>().emysrespwn.position;
                 collision.gameObject.SetActive(false);
@@ -136,6 +171,7 @@ public class Player : MonoBehaviour
             if (collision.gameObject.tag == "Goal")
             {
                 hp += 10;
+                SoundM.instanse.SoundEff(1);
                 collision.gameObject.SetActive(false);
             }
         }

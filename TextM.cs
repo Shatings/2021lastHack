@@ -11,6 +11,7 @@ public class TextM : MonoBehaviour
     public string nickname;
     public bool check = false;
     public GameObject inputtext;
+    public bool clickafag = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -50,11 +51,26 @@ public class TextM : MonoBehaviour
     }
     public void InputName(string _nickname)
     {
-        nickname = _nickname;
+        if (_nickname.Length < 5)
+        {
+            nickname = _nickname;
+        }
+        else
+        {
+            text[2].text = "닉넴이 너무 길어요";
+        }
     }
     public void Logins()
     {
-        StartCoroutine(LoginStart()) ; 
+        if (clickafag == false)
+        {
+            StartCoroutine(LoginStart());
+            clickafag = true;
+        }
+        else
+        {
+            text[2].text = "이미 입력하셨어요 가세요";
+        }
     }
     IEnumerator LoginStart()
     {
@@ -62,10 +78,10 @@ public class TextM : MonoBehaviour
         WWWForm wwf = new WWWForm();
         wwf.AddField("nickname", nickname);
         wwf.AddField("score", gamem.scorre);
-        UnityWebRequest www = UnityWebRequest.Post("http://172.16.7.168:3000", wwf);
+        UnityWebRequest www = UnityWebRequest.Post("http://ec2-15-165-161-44.ap-northeast-2.compute.amazonaws.com:8000", wwf);
         Debug.Log(www);
         yield return www.SendWebRequest();
-        text[3].gameObject.SetActive(true);
+        text[2].gameObject.SetActive(true);
         if (www.isNetworkError || www.isHttpError)
         {
 
@@ -74,9 +90,8 @@ public class TextM : MonoBehaviour
         }
         else
         {
+            Debug.Log("성공~");
             text[2].text = www.downloadHandler.text;
         }
-
-      
     }
 }
